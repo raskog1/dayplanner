@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
         integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="./css/style.css" />
     <title>Work Day Scheduler</title>
 </head>
 
@@ -25,6 +25,75 @@
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="./javascript/script.js"></script>
+
+
+    <script>
+        let startDay = 6;
+        let endDay = 18;
+        let today = moment().format("l");
+        $("#currentDay").text((moment().format("dddd")) + ", " + (moment().format("MMM Do YYYY")));
+
+        // Add all timeblock divs with included assignments/buttons
+        for (i = startDay; i < endDay; i++) {
+            let timeBlock = $("<div>");
+            timeBlock.addClass("row");
+            timeBlock.attr("id", i);
+            $(".container").append(timeBlock);
+
+            let timeStamp = $("<div>");
+            timeStamp.addClass("col-1 hour");
+            timeStamp.attr("value", i);
+
+            // Time display formatting
+            if (i > 12) {
+                timeStamp.text((i - 12) + "pm");
+            } else if (i == 12) {
+                timeStamp.text("12pm");
+            } else {
+                timeStamp.text(i + "am");
+            }
+
+            let textBox = $("<div>");
+            textBox.addClass("col-10 time-block");
+            textBox.attr("value", i);
+
+            // Color code the text boxes
+            if (i == currentHour()) {
+                textBox.addClass("present");
+                textBox.removeClass("past future");
+            } else if (i > currentHour()) {
+                textBox.addClass("future");
+                textBox.removeClass("past present");
+            } else {
+                textBox.addClass("past");
+                textBox.removeClass("present future");
+            }
+
+            let saveBtn = $("<div>");
+            saveBtn.addClass("col-1 saveBtn");
+
+            $(timeBlock).append(timeStamp, textBox, saveBtn);
+
+            let saveIcon = $("<i>");
+            saveIcon.addClass("far fa-save fa-2x saveIcon");
+            saveBtn.append(saveIcon);
+
+
+        }
+
+        // Get the current hour
+        function currentHour() {
+            let date = new Date();
+            let hour = date.getHours();
+            return hour;
+        }
+
+
+
+    </script>
+
+
 </body>
 
 </html>
