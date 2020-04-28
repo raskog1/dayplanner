@@ -31,56 +31,94 @@
     <script>
         let startDay = 6;
         let endDay = 18;
-        let today = moment().format("l");
+        //let today = moment().format("l");
+        let appointments = [];
+
+        // Populates current date at top of the planner
         $("#currentDay").text((moment().format("dddd")) + ", " + (moment().format("MMM Do YYYY")));
 
-        // Add all timeblock divs with included assignments/buttons
-        for (i = startDay; i < endDay; i++) {
-            let timeBlock = $("<div>");
-            timeBlock.addClass("row");
-            timeBlock.attr("id", i);
-            $(".container").append(timeBlock);
+        // Populates scheduling page with all elements
+        $(document).ready(function () {
+            // Add all timeblock divs with included assignments/buttons
+            for (i = startDay; i < endDay; i++) {
 
-            let timeStamp = $("<div>");
-            timeStamp.addClass("col-1 hour");
-            timeStamp.attr("value", i);
+                // Create column to display times throughout the day
+                let timeBlock = $("<div>");
+                timeBlock.addClass("row");
+                $(".container").append(timeBlock);
 
-            // Time display formatting
-            if (i > 12) {
-                timeStamp.text((i - 12) + "pm");
-            } else if (i == 12) {
-                timeStamp.text("12pm");
-            } else {
-                timeStamp.text(i + "am");
+                let timeStamp = $("<div>");
+                timeStamp.addClass("col-1 hour");
+
+                // Time display formatting
+                if (i > 12) {
+                    timeStamp.text((i - 12) + "pm");
+                } else if (i == 12) {
+                    timeStamp.text("12pm");
+                } else {
+                    timeStamp.text(i + "am");
+                }
+
+                // Create a text input column
+                let textBox = $("<textarea>");
+                textBox.addClass("col-10 time-block").attr("id", i);
+
+                // Color code the text boxes
+                if (i == currentHour()) {
+                    textBox.addClass("present");
+                    textBox.removeClass("past future");
+                } else if (i > currentHour()) {
+                    textBox.addClass("future");
+                    textBox.removeClass("past present");
+                } else {
+                    textBox.addClass("past");
+                    textBox.removeClass("present future");
+                }
+
+                // Create a save button column
+                let saveBtn = $("<div>");
+                saveBtn.addClass("col-1 saveBtn");
+
+                $(timeBlock).append(timeStamp, textBox, saveBtn);
+
+                // Create a save icon within the button
+                let saveIcon = $("<i>");
+                saveIcon.addClass("far fa-save fa-2x saveIcon").attr("value", i);
+                $(saveBtn).append(saveIcon);
             }
 
-            let textBox = $("<div>");
-            textBox.addClass("col-10 time-block");
-            textBox.attr("value", i);
 
-            // Color code the text boxes
-            if (i == currentHour()) {
-                textBox.addClass("present");
-                textBox.removeClass("past future");
-            } else if (i > currentHour()) {
-                textBox.addClass("future");
-                textBox.removeClass("past present");
-            } else {
-                textBox.addClass("past");
-                textBox.removeClass("present future");
+
+            // Identifies row in which save was clicked, writes to local storage
+            $(".saveIcon").on("click", function () {
+
+                let saveLocation = $(this).attr("value");
+
+                let userContent = {
+                    location: saveLocation,
+                    content: document.getElementById(saveLocation).value
+                }
+
+                appointments.push(userContent);
+                localStorage.setItem("appointments", JSON.stringify(appointments));
+
+                console.log(appointments);
+            });
+
+            let storedAppt = JSON.parse(localStorage.getItem("appointments"));
+
+            console.log(storedAppt);
+
+            for (i = 0; i < storedAppt.length; i++) {
+                let spotMe = parseInt(storedAppt[i].location);
+                let populateS = document.getElementById(spotMe);
+                populateS.innerHTML = (storedAppt[i].content);
+
+                // we basically need to clear the array after this and resave everything in there
             }
-
-            let saveBtn = $("<div>");
-            saveBtn.addClass("col-1 saveBtn");
-
-            $(timeBlock).append(timeStamp, textBox, saveBtn);
-
-            let saveIcon = $("<i>");
-            saveIcon.addClass("far fa-save fa-2x saveIcon");
-            saveBtn.append(saveIcon);
+        });
 
 
-        }
 
         // Get the current hour
         function currentHour() {
