@@ -7,6 +7,7 @@ $("#currentDay").text((moment().format("dddd")) + ", " + (moment().format("MMM D
 
 // Populates scheduling page with all elements
 $(document).ready(function () {
+
     // Add all timeblock divs with included assignments/buttons
     for (i = startDay; i < endDay; i++) {
 
@@ -30,14 +31,11 @@ $(document).ready(function () {
 
         // Color code the text boxes
         if (i == currentHour()) {
-            textBox.addClass("present");
-            textBox.removeClass("past future");
+            textBox.addClass("present").removeClass("past future");
         } else if (i > currentHour()) {
-            textBox.addClass("future");
-            textBox.removeClass("past present");
+            textBox.addClass("future").removeClass("past present");
         } else {
-            textBox.addClass("past");
-            textBox.removeClass("present future");
+            textBox.addClass("past").removeClass("present future");
         }
 
         // Create a save button column
@@ -64,19 +62,27 @@ $(document).ready(function () {
                 content: saveText
             }
 
+            // Cleans array of multiple entries for one location
+            for (i = 0; i < appointments.length; i++) {
+                if (userContent.location == appointments[i].location) {
+                    appointments.splice(i, 1);
+                }
+            }
+
             appointments.push(userContent);
             localStorage.setItem("appointments", JSON.stringify(appointments));
         }
+        console.log(appointments);
     });
 
     // Pulls appointments array from local storage and repopulates the page
-    appointments = JSON.parse(localStorage.getItem("appointments"));
-    if (appointments.length == 0) {
+    if (window.localStorage.length == 0) {
     } else {
+        appointments = JSON.parse(localStorage.getItem("appointments"));
         for (i = 0; i < appointments.length; i++) {
             let spotMe = appointments[i].location;
             let populateAppt = document.getElementById(spotMe);
-            populateAppt.value = appointments[i];
+            populateAppt.value = appointments[i].content;
         }
         console.log(appointments);
     }
