@@ -1,9 +1,10 @@
 let startDay = 6;
 let endDay = 18;
 let appointments = [];
+let todayDate = moment().format("dddd") + ", " + moment().format("MMM Do YYYY");
 
 // Populates current date at top of the planner
-$("#currentDay").text((moment().format("dddd")) + ", " + (moment().format("MMM Do YYYY")));
+$("#currentDay").text(todayDate);
 
 // Populates scheduling page with all elements
 $(document).ready(function () {
@@ -55,23 +56,22 @@ $(document).ready(function () {
         let saveLocation = $(this).attr("id");
         let saveText = document.getElementById(saveLocation).value;
 
-        if (saveText == "") {
-        } else {
-            let userContent = {
-                location: saveLocation,
-                content: saveText
-            }
-
-            // Cleans array of multiple entries for one location
-            for (i = 0; i < appointments.length; i++) {
-                if (userContent.location == appointments[i].location) {
-                    appointments.splice(i, 1);
-                }
-            }
-
-            appointments.push(userContent);
-            localStorage.setItem("appointments", JSON.stringify(appointments));
+        let userContent = {
+            location: saveLocation,
+            content: saveText,
+            date: moment().format("dddd") + ", " + moment().format("MMM Do YYYY")
         }
+
+        // Cleans array of multiple entries for one location
+        for (i = 0; i < appointments.length; i++) {
+            if (userContent.location == appointments[i].location) {
+                appointments.splice(i, 1);
+            }
+        }
+
+        appointments.push(userContent);
+        localStorage.setItem("appointments", JSON.stringify(appointments));
+
         console.log(appointments);
     });
 
@@ -79,12 +79,17 @@ $(document).ready(function () {
     if (window.localStorage.length == 0) {
     } else {
         appointments = JSON.parse(localStorage.getItem("appointments"));
-        for (i = 0; i < appointments.length; i++) {
-            let spotMe = appointments[i].location;
-            let populateAppt = document.getElementById(spotMe);
-            populateAppt.value = appointments[i].content;
+
+        // Only repopulates appointments from current date, not past dates
+        if (appointments[0].date == todayDate) {
+            for (i = 0; i < appointments.length; i++) {
+                let spotMe = appointments[i].location;
+                let populateAppt = document.getElementById(spotMe);
+                populateAppt.value = appointments[i].content;
+            }
+
+            console.log(appointments);
         }
-        console.log(appointments);
     }
 });
 
