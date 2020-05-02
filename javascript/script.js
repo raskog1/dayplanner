@@ -50,12 +50,27 @@ $(document).ready(function () {
         $(saveBtn).append(saveIcon);
     }
 
+    // Pulls appointments array from local storage and repopulates the page
+    if (window.localStorage.length == 0) {
+    } else {
+        appointments = JSON.parse(localStorage.getItem("appointments"));
+
+        for (i = 0; i < appointments.length; i++) {
+            let spotMe = appointments[i].location;
+            let populateAppt = document.getElementById(spotMe);
+
+            // Should only populate today's appointments, did not have opportunity to test
+            if (appointments[i].date = todayDate) {
+                populateAppt.value = appointments[i].content;
+            }
+        }
+    }
+
     // Identifies row in which save was clicked, writes to local storage
     $(".saveIcon").on("click", function () {
 
         let saveLocation = $(this).attr("id");
         let saveText = document.getElementById(saveLocation).value;
-
         let userContent = {
             location: saveLocation,
             content: saveText,
@@ -71,26 +86,7 @@ $(document).ready(function () {
 
         appointments.push(userContent);
         localStorage.setItem("appointments", JSON.stringify(appointments));
-
-        console.log(appointments);
     });
-
-    // Pulls appointments array from local storage and repopulates the page
-    if (window.localStorage.length == 0) {
-    } else {
-        appointments = JSON.parse(localStorage.getItem("appointments"));
-
-        // Only repopulates appointments from current date, not past dates
-        if (appointments[0].date == todayDate) {
-            for (i = 0; i < appointments.length; i++) {
-                let spotMe = appointments[i].location;
-                let populateAppt = document.getElementById(spotMe);
-                populateAppt.value = appointments[i].content;
-            }
-
-            console.log(appointments);
-        }
-    }
 });
 
 // Get the current hour
